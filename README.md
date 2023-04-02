@@ -1,3 +1,5 @@
+# This is a fork of qwopqwop200's repository meant for stable usage in https://github.com/oobabooga/text-generation-webui.
+
 # GPTQ-for-LLaMA
 4 bits quantization of [LLaMA](https://arxiv.org/abs/2302.13971) using [GPTQ](https://arxiv.org/abs/2210.17323)
 
