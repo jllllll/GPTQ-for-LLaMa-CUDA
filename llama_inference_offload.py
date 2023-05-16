@@ -134,9 +134,15 @@ class Offload_LlamaModel(LlamaModel):
         for idx in range(len(self.layers)):
             if idx <= (self.preload - 1):
                 decoder_layer = self.layers[idx]
+                target_device = decoder_layer.target_device
             else:
                 decoder_layer = self.layers[idx].to(DEV)
-                
+                target_device = DEV
+
+            hidden_states = hidden_states.to(target_device)
+            attention_mask = attention_mask.to(target_device)
+            position_ids = position_ids.to(target_device)
+
             if output_hidden_states:
                 all_hidden_states += (hidden_states,)
 
@@ -182,6 +188,10 @@ class Offload_LlamaModel(LlamaModel):
             if output_attentions:
                 all_self_attns += (layer_outputs[1],)
 
+        hidden_states = hidden_states.to(DEV)
+        attention_mask = attention_mask.to(DEV)
+        position_ids = position_ids.to(DEV)
+    
         hidden_states = self.norm(hidden_states)
 
         # add hidden states from the last decoder layer
@@ -228,12 +238,21 @@ def load_quant(model, checkpoint, wbits, groupsize, pre_layer):
         model.load_state_dict(torch.load(checkpoint))
     model.seqlen = 2048
     
-    for i in range(pre_layer):
-        model.model.layers[i].to(DEV)
+    if (isinstance(pre_layer, int)):
+        pre_layer = [pre_layer]
+    last_layer = 0
+    for index, dev_layer in enumerate(pre_layer):
+        target = torch.device(f'cuda:{index}')
+        for i in range(last_layer, dev_layer):
+            model.model.layers[i].to(target)
+            model.model.layers[i].target_device = target
+        last_layer = dev_layer
+    for i in range(last_layer, len(model.model.layers)):
+        model.model.layers[i].target_device = torch.device('cpu')
     model.model.embed_tokens.to(DEV)
     model.model.norm.to(DEV)
     model.lm_head.to(DEV)
-    model.model.preload = pre_layer
+    model.model.preload = last_layer
     print('Done.')
     return model
 
