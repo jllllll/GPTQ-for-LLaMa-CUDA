@@ -1,4 +1,26 @@
-# This is a fork of qwopqwop200's repository meant for stable usage in https://github.com/oobabooga/text-generation-webui.
+## This is a fork of qwopqwop200's repository meant for stable usage in [text-generation-webui](https://github.com/oobabooga/text-generation-webui).
+This package uses [import redirection](https://github.com/jllllll/GPTQ-for-LLaMa-CUDA/blob/main/gptq_for_llama/__init__.py) to allow for easier integration with existing projects.
+
+[Oobabooga's fork](https://github.com/oobabooga/GPTQ-for-LLaMa) is used by default when a compatible GPU is detected.  
+[qwopqwop200's 'cuda' branch](https://github.com/qwopqwop200/GPTQ-for-LLaMa/tree/cuda) is used for GPUs older than Pascal.  
+AMD-compatible conversions of both are available courtesy of [WapaMario63's](https://github.com/WapaMario63) work: [GPTQ-for-LLaMa-ROCm](https://github.com/WapaMario63/GPTQ-for-LLaMa-ROCm)
+
+Python modules can be imported as if they are in the main package and the appropriate versions will be selected:
+```python
+import gptq_for_llama.llama_inference_offload
+from gptq_for_llama.modelutils import find_layers
+from gptq_for_llama.quant import make_quant
+```
+
+This can be overriden by setting the `QUANT_CUDA_OVERRIDE` environment variable to either `old` or `new` before importing.
+There is also an experimental function for switching versions on the fly:
+```python
+from gptq_for_llama import switch_gptq
+
+switch_gptq('new')
+import gptq_for_llama.llama_inference_offload
+```
+Limited testing showed reliable swapping of versions. However, this may not work when swapping models repeatedly.
 
 # GPTQ-for-LLaMA
 4 bits quantization of [LLaMA](https://arxiv.org/abs/2302.13971) using [GPTQ](https://arxiv.org/abs/2210.17323)
