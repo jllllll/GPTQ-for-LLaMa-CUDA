@@ -1,5 +1,5 @@
-safetensors==0.3.0
-datasets==2.10.1
+safetensors>=0.3.0
+datasets>=2.10.1
 sentencepiece
-transformers==4.28.0
-accelerate==0.18.0
+transformers>=4.28.0
+accelerate>=0.18.0
