@@ -1,5 +1,6 @@
-import platform
+import copy
 import os
+import platform
 import re
 import subprocess
 import torch
@@ -22,7 +23,7 @@ extra_compile_args = {
     "cxx": ["-O3"],
     "nvcc": ["-O3"],
 }
-extra_compile_args_faster = extra_compile_args
+extra_compile_args_faster = copy.deepcopy(extra_compile_args)
     
 quant_cuda = [ "quant_cuda/quant_cuda.cpp", "quant_cuda/quant_cuda_kernel.cu" ]
 quant_cuda_faster = [ "quant_cuda_faster/quant_cuda.cpp", "quant_cuda_faster/quant_cuda_kernel.cu" ]
