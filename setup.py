@@ -11,9 +11,8 @@ from torch.utils import cpp_extension
 def get_cuda_version(cuda_home=os.environ.get('CUDA_PATH', os.environ.get('CUDA_HOME', ''))):
     if cuda_home == '' or not os.path.exists(os.path.join(cuda_home,"bin","nvcc.exe" if platform.system() == "Windows" else "nvcc")):
         return ''
-    version_str = subprocess.check_output([os.path.join(cuda_home,"bin","nvcc"),"--version"])
-    version_str=str(version_str).replace('\n', '').replace('\r', '')
-    idx=version_str.find("release")
+    version_str = subprocess.check_output([os.path.join(cuda_home,"bin","nvcc"),"--version"]).decode('utf-8')
+    idx = version_str.find("release")
     return version_str[idx+len("release "):idx+len("release ")+4]
     
 CUDA_VERSION = "".join(get_cuda_version().split(".")) if not torch.version.hip else False
