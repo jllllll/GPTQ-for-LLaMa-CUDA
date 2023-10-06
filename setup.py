@@ -38,7 +38,7 @@ elif torch.version.cuda:
         flags_faster = ['-gencode=arch=compute_60,code=compute_60', '-gencode=arch=compute_60,code=sm_60']
     extra_compile_args_faster["nvcc"] = extra_compile_args_faster["nvcc"] + flags_faster
 
-version = "0.1.0" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else f"+rocm{ROCM_VERSION}" if ROCM_VERSION else "")
+version = "0.1.1" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else f"+rocm{ROCM_VERSION}" if ROCM_VERSION else "")
 setup(
     name="gptq_for_llama",
     version=version,
