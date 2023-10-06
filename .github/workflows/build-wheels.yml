@@ -1,6 +1,13 @@
 name: Build Wheels
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      rocm:
+        description: 'Build ROCm wheels as well? 1 = yes, 0 = no'
+        default: '1'
+        required: true
+        type: string
 
 jobs:
   build_wheels:
@@ -53,9 +60,8 @@ jobs:
           $cudaNum = [int]$cudaVersion.substring($cudaVersion.LastIndexOf('.')+1)
           while ($cudaNum -ge 0) { $cudaChannels += '-c nvidia/label/cuda-' + $cudaVersion.Remove($cudaVersion.LastIndexOf('.')+1) + $cudaNum + ' '; $cudaNum-- }
           mamba install -y 'cuda' $cudaChannels.TrimEnd().Split()
-          if ([version]$env:CUDAVER -gt [version]'11.8.0') {$torchver = "--pre --index-url https://download.pytorch.org/whl/nightly/cu$cudaVersionPytorch"} else {$torchver = "--index-url https://download.pytorch.org/whl/cu$cudaVersionPytorch"}
-          python -m pip install torch $torchver.split()
-          python -m pip install build wheel safetensors sentencepiece ninja
+          if ([version]$env:CUDAVER -gt [version]'11.8.0') {$torch = "torch==2.1.0"} else {$torch = "torch==2.0.1"}
+          python -m pip install build wheel safetensors sentencepiece ninja $torch --extra-index-url "https://download.pytorch.org/whl/cu$cudaVersionPytorch"
         
       - name: Build Wheel
         run: |
@@ -73,5 +79,6 @@ jobs:
           
   build_rocm:
     name: Build ROCm Wheels
+    if: inputs.rocm == '1'
     needs: build_wheels
     uses: ./.github/workflows/build-wheels-rocm.yml
